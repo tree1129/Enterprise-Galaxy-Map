@@ -1,0 +1,264 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="以企业画像、能力关系和 AI 自动化服务为核心的硬科技企业星图。">
+  <title>企业星图 · 硬科技生态网络</title>
+  <style>
+    :root{
+      --blue:#4285f4;--red:#ea4335;--yellow:#fbbc04;--green:#34a853;
+      --ink:#202124;--muted:#5f6368;--subtle:#80868b;--line:#dadce0;
+      --canvas:#f8fafd;--surface:#fff;--hover:#f1f3f4;--blue-soft:#e8f0fe;
+      --shadow:0 1px 2px rgba(60,64,67,.08),0 2px 8px rgba(60,64,67,.07);
+    }
+    *{box-sizing:border-box}
+    html,body{margin:0;min-height:100%;font-family:Arial,"Noto Sans SC","Microsoft YaHei",sans-serif;color:var(--ink);background:var(--canvas)}
+    button,input,select{font:inherit}
+    button{cursor:pointer}
+    button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid rgba(66,133,244,.25);outline-offset:2px}
+    .app{min-height:100vh;display:flex;flex-direction:column}
+    .topbar{height:64px;flex:none;display:flex;align-items:center;gap:22px;padding:0 22px;background:var(--surface);border-bottom:1px solid var(--line);position:relative;z-index:20}
+    .brand{display:flex;align-items:center;gap:11px;min-width:205px}
+    .brand-mark{width:32px;height:32px;position:relative;display:grid;grid-template-columns:1fr 1fr;gap:3px;transform:rotate(45deg);padding:5px;border-radius:10px;background:#fff;box-shadow:var(--shadow)}
+    .brand-mark i{display:block;border-radius:3px}.brand-mark i:nth-child(1){background:var(--blue)}.brand-mark i:nth-child(2){background:var(--red)}.brand-mark i:nth-child(3){background:var(--green)}.brand-mark i:nth-child(4){background:var(--yellow)}
+    .brand-copy strong{display:block;font-size:17px;font-weight:500;letter-spacing:.02em}.brand-copy span{display:block;margin-top:2px;font-size:10px;color:var(--subtle);letter-spacing:.12em}
+    .global-search{height:42px;max-width:640px;flex:1;display:flex;align-items:center;gap:10px;padding:0 14px;border:1px solid transparent;border-radius:22px;background:#f1f3f4;transition:.18s}
+    .global-search:focus-within{background:#fff;border-color:var(--line);box-shadow:0 1px 6px rgba(60,64,67,.2)}
+    .global-search svg{width:18px;height:18px;color:var(--muted);flex:none}.global-search input{width:100%;border:0;outline:0;background:transparent;color:var(--ink);font-size:14px}
+    .header-meta{margin-left:auto;display:flex;align-items:center;gap:18px;color:var(--muted);font-size:12px;white-space:nowrap}.header-meta b{color:var(--blue);font-weight:500}.avatar{width:32px;height:32px;border-radius:50%;display:grid;place-items:center;background:var(--blue);color:#fff;font-size:12px;font-weight:500}
+    .shell{flex:1;min-height:0;display:grid;grid-template-columns:224px minmax(480px,1fr) 336px}
+    .sidebar{padding:18px 14px;background:var(--surface);border-right:1px solid var(--line);overflow:auto}
+    .side-label{padding:0 10px;margin:8px 0 10px;color:var(--subtle);font-size:11px;font-weight:500;letter-spacing:.08em;text-transform:uppercase}
+    .sector-list{display:grid;gap:3px}.sector-btn{width:100%;min-height:39px;border:0;border-radius:20px;background:transparent;display:grid;grid-template-columns:11px 1fr auto;align-items:center;gap:9px;padding:0 12px;color:var(--muted);text-align:left;font-size:13px}.sector-btn:hover{background:var(--hover)}.sector-btn.active{background:var(--blue-soft);color:#174ea6;font-weight:500}.sector-dot{width:8px;height:8px;border-radius:50%;background:var(--tone)}.sector-count{font-size:11px;color:var(--subtle)}
+    .side-rule{height:1px;margin:18px 8px;background:var(--line)}
+    .source-list{display:grid;gap:7px;padding:0 7px}.source-item{display:flex;align-items:center;gap:10px;padding:9px;border-radius:10px;background:#f8fafd}.source-logo{width:28px;height:28px;display:grid;place-items:center;border-radius:8px;background:var(--source);color:#fff;font-size:10px;font-weight:500}.source-item strong{display:block;font-size:12px;font-weight:500}.source-item span{display:block;margin-top:2px;color:var(--subtle);font-size:10px}.source-note{padding:10px;color:var(--subtle);font-size:10px;line-height:1.6}
+    .main{min-width:0;padding:16px;background:var(--canvas)}
+    .graph-card{height:calc(100vh - 96px);min-height:640px;position:relative;overflow:hidden;border:1px solid var(--line);border-radius:18px;background:var(--surface);box-shadow:var(--shadow);user-select:none;touch-action:none}
+    .graph-head{height:76px;display:flex;align-items:center;justify-content:space-between;gap:20px;padding:0 20px;border-bottom:1px solid #eef0f2;position:relative;z-index:8;background:rgba(255,255,255,.92);backdrop-filter:blur(8px)}
+    .graph-title strong{display:block;font-size:18px;font-weight:500}.graph-title span{display:block;margin-top:5px;color:var(--muted);font-size:12px}.graph-actions{display:flex;align-items:center;gap:8px}.icon-btn{width:36px;height:36px;border:1px solid var(--line);border-radius:50%;display:grid;place-items:center;background:#fff;color:var(--muted)}.icon-btn:hover{background:var(--hover)}.icon-btn svg{width:17px;height:17px}
+    .stage{position:absolute;inset:76px 0 58px;overflow:hidden;background:radial-gradient(circle at 50% 51%,#fff 0,#f7fbff 46%,#edf4fd 100%)}
+    .stage.dragging{cursor:grabbing}.stage canvas,.stage svg,.node-layer{position:absolute;inset:0;width:100%;height:100%}.stage canvas{z-index:0}.stage svg{z-index:1;overflow:visible}.node-layer{z-index:2;pointer-events:none}
+    .edge{fill:none;stroke:#b7c7de;stroke-width:1.1;opacity:.56;transition:opacity .15s,stroke-width .15s}.edge.cross{stroke:#c5aeea;stroke-dasharray:4 4}.edge.custom{stroke:var(--green);stroke-width:2}.edge.highlight{opacity:1;stroke-width:2.4}.edge.dim{opacity:.14}
+    .company{--tone:var(--blue);--depth-scale:1;position:absolute;width:84px;height:58px;transform:translate(-50%,-50%) scale(var(--depth-scale));transform-origin:center;pointer-events:auto;border:0;background:transparent;padding:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;color:var(--tone);transition:opacity .15s,filter .15s,transform .12s}.company.dim{opacity:.24}.company-orb{width:var(--diameter);height:var(--diameter);border:2px solid currentColor;border-radius:50%;display:grid;place-items:center;background:#fff;box-shadow:0 0 0 4px rgba(255,255,255,.86),0 3px 12px color-mix(in srgb,currentColor 22%,transparent);color:var(--ink);font-size:9px;font-weight:500}.company-label{display:none;max-width:105px;padding:2px 6px;border-radius:8px;background:rgba(255,255,255,.94);box-shadow:0 2px 7px rgba(60,64,67,.15);color:var(--ink);font-size:10px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.company:hover,.company.selected,.company.neighbor{z-index:1000!important}.company:hover .company-label,.company.selected .company-label,.company.neighbor .company-label{display:block}.company.selected .company-orb{box-shadow:0 0 0 5px color-mix(in srgb,currentColor 18%,transparent),0 4px 12px color-mix(in srgb,currentColor 24%,transparent)}
+    .core-label{fill:var(--muted);font-size:11px;font-weight:500;text-anchor:middle}.core-ring{fill:none;stroke:#b8c9e6;stroke-width:1;stroke-dasharray:3 5}.core-dot{fill:var(--blue)}
+    .stage-note{position:absolute;left:18px;bottom:16px;z-index:6;color:var(--subtle);font-size:11px}.legend{position:absolute;right:18px;bottom:14px;z-index:6;display:flex;align-items:center;gap:12px;padding:7px 10px;border:1px solid var(--line);border-radius:14px;background:rgba(255,255,255,.9);color:var(--muted);font-size:10px}.legend span{display:flex;align-items:center;gap:5px}.legend i{width:18px;border-top:2px solid var(--blue)}.legend .dashed{border-top-style:dashed;border-color:#a98bd4}.legend .green{border-color:var(--green)}
+    .linkbar{height:58px;position:absolute;left:0;right:0;bottom:0;z-index:9;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:0 16px;border-top:1px solid var(--line);background:#fff}.selection{min-width:0;color:var(--muted);font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.selection strong{color:var(--ink);font-weight:500}.link-actions{display:flex;align-items:center;gap:8px;flex:none}.select,.btn{height:36px;border:1px solid var(--line);border-radius:18px;background:#fff;padding:0 13px;color:var(--muted);font-size:12px}.btn:hover,.select:hover{background:var(--hover)}.btn.primary{border-color:var(--blue);background:var(--blue);color:#fff}.btn.primary:disabled{border-color:var(--line);background:#eef0f2;color:#9aa0a6;cursor:default}.action-pill{height:36px;border:1px solid #c6dafc;border-radius:18px;background:var(--blue-soft);color:#174ea6;padding:0 13px;display:flex;align-items:center;gap:7px;font-size:11px;font-weight:500}.action-pill:hover{background:#dbe8fd}.action-pill svg{width:15px;height:15px}
+    .detail{background:var(--surface);border-left:1px solid var(--line);overflow:auto}.panel-tabs{position:sticky;top:0;z-index:12;display:grid;grid-template-columns:1fr 1fr;gap:6px;padding:10px 14px;border-bottom:1px solid var(--line);background:rgba(255,255,255,.96);backdrop-filter:blur(8px)}.panel-tab{height:36px;border:0;border-radius:18px;background:transparent;color:var(--muted);font-size:12px}.panel-tab:hover{background:var(--hover)}.panel-tab.active{background:var(--blue-soft);color:#174ea6;font-weight:500}.panel-view[hidden]{display:none}.detail-head{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;padding:22px 20px 16px;border-bottom:1px solid var(--line)}.company-heading{display:flex;align-items:center;gap:12px}.company-badge{width:46px;height:46px;border-radius:14px;display:grid;place-items:center;background:var(--blue-soft);color:#174ea6;font-size:13px;font-weight:500}.company-heading h1{margin:0;font-size:20px;font-weight:500}.company-heading p{margin:5px 0 0;color:var(--muted);font-size:11px}.live-pill{display:flex;align-items:center;gap:5px;padding:6px 8px;border-radius:12px;background:#e6f4ea;color:#137333;font-size:10px;white-space:nowrap}.live-pill i{width:6px;height:6px;border-radius:50%;background:var(--green)}
+    .detail-body{padding:16px 20px 30px}.section{padding:15px 0;border-bottom:1px solid #edf0f2}.section:last-child{border-bottom:0}.section-title{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px;color:var(--muted);font-size:11px;font-weight:500}.source-grid{display:grid;gap:7px}.data-source{display:grid;grid-template-columns:66px 1fr auto;align-items:center;gap:8px;padding:9px 10px;border-radius:10px;background:#f8fafd}.data-source strong{font-size:11px;font-weight:500}.data-source span{color:var(--subtle);font-size:10px}.data-source em{font-style:normal;font-size:10px;color:var(--blue)}.data-source.venture em{color:#9334e6}.data-source.private em{color:#b06000}
+    .profile-status{display:flex;align-items:center;gap:5px;color:#137333;font-size:9px;font-weight:400}.profile-status i{width:6px;height:6px;border-radius:50%;background:var(--green)}.company-intro{margin:0;color:#3c4043;font-size:11px;line-height:1.75}.profile-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}.profile-card{min-width:0;padding:10px;border:1px solid #e7eaee;border-radius:11px;background:#f8fafd}.profile-card.wide{grid-column:1/-1}.profile-card span{display:block;color:var(--subtle);font-size:9px}.profile-card strong{display:block;margin-top:5px;color:var(--ink);font-size:11px;font-weight:500;line-height:1.45}.profile-tags{display:flex;flex-wrap:wrap;gap:5px;margin-top:10px}.profile-tag{padding:5px 7px;border-radius:10px;background:var(--blue-soft);color:#174ea6;font-size:9px}.profile-foot{display:flex;align-items:center;gap:6px;margin-top:10px;color:var(--subtle);font-size:9px;line-height:1.5}.profile-foot svg{width:13px;height:13px;flex:none;color:var(--blue)}
+    .flow{display:grid;grid-template-columns:repeat(5,1fr);gap:3px}.flow-step{position:relative;text-align:center;color:var(--subtle);font-size:9px}.flow-step:not(:last-child):after{content:"";position:absolute;left:62%;right:-38%;top:9px;height:1px;background:var(--line)}.flow-step i{position:relative;z-index:1;display:grid;place-items:center;width:19px;height:19px;margin:0 auto 5px;border-radius:50%;background:var(--step);color:#fff;font-style:normal;font-size:9px}
+    .tags{display:flex;flex-wrap:wrap;gap:6px}.tag{padding:5px 8px;border-radius:12px;background:#f1f3f4;color:var(--muted);font-size:10px}.tag.blue{background:var(--blue-soft);color:#174ea6}.tag.green{background:#e6f4ea;color:#137333}
+    .todos{display:grid;gap:7px}.todo{display:grid;grid-template-columns:9px 1fr auto;align-items:center;gap:8px;padding:9px 0}.todo-dot{width:8px;height:8px;border-radius:50%;background:var(--green)}.todo.human .todo-dot{background:var(--yellow)}.todo strong{display:block;font-size:11px;font-weight:500}.todo span{display:block;margin-top:3px;color:var(--subtle);font-size:10px}.todo-route{padding:4px 7px;border-radius:10px;background:#e6f4ea;color:#137333;font-size:9px}.todo.human .todo-route{background:#fef7e0;color:#b06000}
+    .partner-list{display:flex;flex-wrap:wrap;gap:7px}.partner{display:flex;align-items:center;gap:6px;padding:6px 8px;border:1px solid var(--line);border-radius:14px;color:var(--muted);font-size:10px}.partner i{width:7px;height:7px;border-radius:50%;background:var(--blue)}
+    .my-galaxy{padding:18px 18px 32px}.my-hero{padding:18px;border:1px solid #d2e3fc;border-radius:18px;background:linear-gradient(145deg,#f8fbff,#eef4ff);box-shadow:0 6px 24px rgba(66,133,244,.08)}.my-hero-icon{width:42px;height:42px;display:grid;place-items:center;border-radius:14px;background:#fff;color:var(--blue);box-shadow:var(--shadow)}.my-hero-icon svg{width:23px;height:23px}.my-hero h2{margin:14px 0 6px;font-size:19px;font-weight:500}.my-hero p{margin:0;color:var(--muted);font-size:11px;line-height:1.65}.field-label{display:block;margin:16px 0 7px;color:var(--muted);font-size:10px;font-weight:500}.company-select{width:100%;height:42px;padding:0 12px;border:1px solid var(--line);border-radius:10px;background:#fff;color:var(--ink);font-size:12px}.my-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}.my-actions .btn{width:100%;border-radius:10px}.btn.ai{border-color:var(--blue);background:var(--blue);color:#fff}.btn.ai.running{background:#5f8fdc;cursor:wait}.my-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:14px 0 18px}.my-stat{padding:11px 8px;border:1px solid var(--line);border-radius:12px;background:#fff;text-align:center}.my-stat strong{display:block;color:var(--blue);font-size:17px;font-weight:500}.my-stat span{display:block;margin-top:3px;color:var(--subtle);font-size:9px}.recommend-head{display:flex;align-items:center;justify-content:space-between;margin:18px 2px 10px}.recommend-head strong{font-size:12px;font-weight:500}.recommend-head span{color:var(--subtle);font-size:9px}.recommend-list{display:grid;gap:8px}.recommend{display:grid;grid-template-columns:36px minmax(0,1fr) auto;align-items:center;gap:9px;padding:10px;border:1px solid var(--line);border-radius:13px;background:#fff}.recommend-badge{width:36px;height:36px;display:grid;place-items:center;border-radius:11px;background:color-mix(in srgb,var(--tone) 12%,white);color:var(--tone);font-size:10px;font-weight:500}.recommend-copy{min-width:0}.recommend-copy strong{display:block;font-size:11px;font-weight:500}.recommend-copy span{display:block;margin-top:3px;color:var(--subtle);font-size:9px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.match{display:grid;justify-items:end;gap:5px}.match b{color:var(--green);font-size:10px;font-weight:500}.mini-add{height:25px;border:1px solid #c6dafc;border-radius:13px;background:var(--blue-soft);padding:0 8px;color:#174ea6;font-size:9px}.mini-add.connected{border-color:#ceead6;background:#e6f4ea;color:#137333}.my-network-note{margin-top:14px;padding:10px 11px;border-radius:11px;background:#f8fafd;color:var(--muted);font-size:10px;line-height:1.55}.edge.ai{stroke:var(--blue);stroke-width:2.6;filter:drop-shadow(0 0 3px rgba(66,133,244,.25))}
+    .empty-detail{display:none;padding:70px 25px;text-align:center;color:var(--muted)}.empty-detail svg{width:42px;height:42px;margin-bottom:12px;color:#bdc1c6}.detail.empty .detail-head,.detail.empty .detail-body{display:none}.detail.empty .empty-detail{display:block}
+    .toast{position:fixed;left:50%;bottom:24px;z-index:100;transform:translate(-50%,20px);padding:10px 16px;border-radius:8px;background:#323232;color:#fff;font-size:12px;opacity:0;pointer-events:none;transition:.2s}.toast.show{transform:translate(-50%,0);opacity:1}
+    @media(max-width:1120px){.shell{grid-template-columns:190px minmax(420px,1fr) 310px}.brand{min-width:170px}.sidebar{padding-left:8px;padding-right:8px}.main{padding:10px}.graph-card{height:calc(100vh - 84px)}.detail-body,.detail-head{padding-left:16px;padding-right:16px}}
+    @media(max-width:900px){.shell{grid-template-columns:1fr}.sidebar{border-right:0;border-bottom:1px solid var(--line);padding:10px 14px}.side-label,.side-rule,.source-list,.source-note{display:none}.sector-list{display:flex;overflow:auto;gap:5px}.sector-btn{width:auto;min-width:max-content;padding:0 13px}.main{padding:10px}.graph-card{height:650px;min-height:600px}.detail{border-left:0;border-top:1px solid var(--line)}.detail-body{display:grid;grid-template-columns:1fr 1fr;gap:0 22px}.section{min-width:0}.my-galaxy{max-width:720px;margin:auto}}
+    @media(max-width:620px){.topbar{padding:0 14px}.brand{min-width:0}.brand-copy span,.header-meta span{display:none}.global-search{display:none}.shell{display:block}.graph-card{height:610px;min-height:560px}.graph-head{height:72px;padding:0 14px}.stage{inset:72px 0 104px}.linkbar{height:104px;align-items:flex-start;flex-direction:column;padding:11px 12px}.link-actions{width:100%}.select{flex:1;min-width:0}.detail-body{display:block}.legend{display:none}.stage-note{bottom:12px}.company{width:66px}.company-label{font-size:9px}}
+  </style>
+</head>
+<body>
+  <div class="app">
+    <header class="topbar">
+      <div class="brand"><span class="brand-mark" aria-hidden="true"><i></i><i></i><i></i><i></i></span><span class="brand-copy"><strong>企业星图</strong><span>ENTERPRISE GALAXY</span></span></div>
+      <label class="global-search" aria-label="搜索企业、赛道或能力">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-3.6-3.6"></path></svg>
+        <input id="search" type="search" placeholder="搜索企业、赛道或能力">
+      </label>
+      <div class="header-meta"><span><b id="company-total">116</b> 家企业</span><span><b id="industry-total">10</b> 个产业</span><span><b>3</b> 类数据</span><div class="avatar" aria-label="团队账号">HT</div></div>
+    </header>
+
+    <div class="shell">
+      <aside class="sidebar" aria-label="产业分类与数据源">
+        <div class="side-label">产业分类</div>
+        <div class="sector-list" id="sector-list"></div>
+        <div class="side-rule"></div>
+        <div class="side-label">企业数据源</div>
+        <div class="source-list">
+          <div class="source-item"><span class="source-logo" style="--source:var(--blue)">企</span><div><strong>企查查</strong><span>工商 · 股权 · 风险</span></div></div>
+          <div class="source-item"><span class="source-logo" style="--source:#9334e6">桔</span><div><strong>IT桔子</strong><span>融资 · 产品 · 赛道</span></div></div>
+          <div class="source-item"><span class="source-logo" style="--source:var(--green)">内</span><div><strong>企业授权数据</strong><span>流程 · 文档 · 任务</span></div></div>
+        </div>
+        <p class="source-note">当前页面为产品演示。正式数据需通过合法授权接口接入，并保留字段来源与更新时间。</p>
+      </aside>
+
+      <main class="main">
+        <section class="graph-card" aria-label="企业关系星图">
+          <header class="graph-head">
+            <div class="graph-title"><strong>硬科技企业网络</strong><span id="graph-subtitle">全部产业 · 能力、需求与合作关系</span></div>
+            <div class="graph-actions"><button class="action-pill" id="open-my" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"></circle><path d="M4.9 4.9c3.9-3.9 10.3-3.9 14.2 0s3.9 10.3 0 14.2-10.3 3.9-14.2 0-3.9-10.3 0-14.2Z"></path><path d="M2.5 12h3M18.5 12h3M12 2.5v3M12 18.5v3"></path></svg>我的星系图</button><button class="icon-btn" id="reset" type="button" aria-label="复位视图"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"></path><path d="M3 3v5h5"></path></svg></button></div>
+          </header>
+          <div class="stage" id="stage">
+            <canvas id="cloud" aria-label="浅色银河点云背景"></canvas>
+            <svg id="relations" role="img" aria-label="企业关系连线"></svg>
+            <div class="node-layer" id="nodes"></div>
+            <div class="stage-note">拖动旋转 3D 空间 · 滚轮缩放 · 点击企业查看画像</div>
+            <div class="legend"><span><i></i>产业链</span><span><i class="dashed"></i>跨产业</span><span><i class="green"></i>新建关系</span></div>
+          </div>
+          <div class="linkbar">
+            <div class="selection" id="selection" aria-live="polite">已选择 <strong>宇树科技</strong>，再选一家企业建立联系</div>
+            <div class="link-actions"><select class="select" id="relation-type" aria-label="关系类型"><option>技术合作</option><option>供应链</option><option>生态伙伴</option></select><button class="btn primary" id="connect" type="button" disabled>建立联系</button><button class="btn" id="clear" type="button">清除</button></div>
+          </div>
+        </section>
+      </main>
+
+      <aside class="detail" id="detail" aria-label="企业名片与我的星系图" aria-live="polite">
+        <nav class="panel-tabs" aria-label="右侧功能"><button class="panel-tab active" id="tab-profile" type="button">企业名片</button><button class="panel-tab" id="tab-my" type="button">我的星系图</button></nav>
+        <div class="panel-view" id="profile-panel">
+          <div class="detail-head">
+            <div class="company-heading"><div class="company-badge" id="company-badge">宇树</div><div><h1 id="company-name">宇树科技</h1><p id="company-meta">机器人 · 企业画像与 AI 服务</p></div></div>
+            <span class="live-pill"><i></i>AI 服务中</span>
+          </div>
+          <div class="detail-body">
+            <section class="section"><div class="section-title"><span>企业介绍</span><span class="profile-status"><i></i>一企一档</span></div><p class="company-intro" id="company-intro"></p></section>
+            <section class="section"><div class="section-title"><span>精准画像</span><span id="profile-updated">公开资料 + 企业数据</span></div><div class="profile-grid"><div class="profile-card"><span>核心方向</span><strong id="profile-direction"></strong></div><div class="profile-card"><span>产业角色</span><strong id="profile-role"></strong></div><div class="profile-card wide"><span>典型场景</span><strong id="profile-scenes"></strong></div><div class="profile-card wide"><span>协作需求</span><strong id="profile-needs"></strong></div></div><div class="profile-tags" id="profile-tags"></div><div class="profile-foot"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 3 4 7v5c0 5 3.4 8 8 9 4.6-1 8-4 8-9V7l-8-4Z"></path><path d="m9 12 2 2 4-4"></path></svg><span>画像字段保留数据来源，正式版可接入企查查、IT桔子与企业授权数据持续校准。</span></div></section>
+            <section class="section"><div class="section-title">企业数据底座</div><div class="source-grid"><div class="data-source"><strong>企查查</strong><span>工商 · 股权 · 风险</span><em>主档案</em></div><div class="data-source venture"><strong>IT桔子</strong><span>融资 · 产品 · 赛道</span><em>创投补充</em></div><div class="data-source private"><strong>企业授权</strong><span>流程 · 文档 · 任务</span><em>能力证据</em></div></div></section>
+            <section class="section"><div class="section-title">AI 服务闭环</div><div class="flow"><span class="flow-step"><i style="--step:var(--blue)">1</i>数据</span><span class="flow-step"><i style="--step:var(--red)">2</i>TODO</span><span class="flow-step"><i style="--step:var(--yellow);color:#5f4300">3</i>执行</span><span class="flow-step"><i style="--step:var(--green)">4</i>画像</span><span class="flow-step"><i style="--step:var(--blue)">5</i>连接</span></div></section>
+            <section class="section"><div class="section-title">企业授权数据</div><div class="tags" id="source-tags"></div></section>
+            <section class="section"><div class="section-title"><span>本轮 TODO</span><span id="todo-count">3 项</span></div><div class="todos" id="todos"></div></section>
+            <section class="section"><div class="section-title">执行证据写回企业名片</div><div class="tags" id="evidence-tags"></div></section>
+            <section class="section"><div class="section-title">推荐连接</div><div class="partner-list" id="partners"></div></section>
+          </div>
+          <div class="empty-detail"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="9"></circle><path d="M8 12h8M12 8v8"></path></svg><div>选择一颗企业星体查看完整名片</div></div>
+        </div>
+        <div class="panel-view my-galaxy" id="my-panel" hidden>
+          <section class="my-hero">
+            <div class="my-hero-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="3"></circle><ellipse cx="12" cy="12" rx="10" ry="4.5"></ellipse><ellipse cx="12" cy="12" rx="4.5" ry="10" transform="rotate(45 12 12)"></ellipse></svg></div>
+            <h2>建立我的星系图</h2>
+            <p>以你的企业为恒星，用人工判断或 AI 匹配建立技术、供应链与生态关系。</p>
+            <label class="field-label" for="my-company">我的企业</label>
+            <select class="company-select" id="my-company"></select>
+            <div class="my-actions"><button class="btn" id="manual-mode" type="button">手动建立联系</button><button class="btn ai" id="ai-connect" type="button">AI 自动建立</button></div>
+          </section>
+          <div class="my-stats"><div class="my-stat"><strong id="my-link-count">0</strong><span>已建立关系</span></div><div class="my-stat"><strong id="my-sector-count">0</strong><span>覆盖赛道</span></div><div class="my-stat"><strong id="my-ai-count">4</strong><span>AI 候选</span></div></div>
+          <div class="recommend-head"><strong>AI 关系候选</strong><span>基于能力与产业链互补</span></div>
+          <div class="recommend-list" id="ai-recommendations"></div>
+          <div class="my-network-note">手动模式：选定“我的企业”后，在星图中点击另一家企业，再于底部选择关系类型并建立联系。</div>
+        </div>
+      </aside>
+    </div>
+  </div>
+  <div class="toast" id="toast" role="status"></div>
+
+  <script>
+    const colors={blue:'#4285f4',red:'#ea4335',yellow:'#fbbc04',green:'#34a853',purple:'#9334e6',cyan:'#12b5cb'};
+    const categories=[
+      ['all','全部产业',colors.blue],['chip','芯片半导体',colors.blue],['ai','AI 与算力',colors.red],['robot','机器人',colors.yellow],['energy','新能源',colors.green],['auto','智能汽车',colors.blue],['space','航天低空',colors.purple],['manufacture','先进制造',colors.cyan],['quantum','量子光电',colors.red],['bio','生命医疗',colors.green],['sensor','显示感知',colors.yellow]
+    ].map(([id,name,color],i)=>({id,name,color,angle:-Math.PI/2+Math.max(0,i-1)*Math.PI*2/10}));
+    const groups={
+      chip:['华为','中芯国际','寒武纪','长江存储','海光信息','澜起科技','壁仞科技','沐曦','燧原科技','天岳先进'],
+      ai:['商汤科技','科大讯飞','第四范式','云从科技','依图科技','智谱AI','百川智能','月之暗面','MiniMax','阶跃星辰','DeepSeek','零一万物','面壁智能','硅基流动','无问芯穹','九章云极','澜舟科技','达观数据','小冰公司','循环智能','元象科技','生数科技','爱诗科技','云天励飞','格灵深瞳','硅基智能'],
+      robot:['大疆','宇树科技','优必选','科沃斯','石头科技','埃斯顿','新松机器人','乐聚机器人','傅利叶智能','节卡机器人'],
+      energy:['宁德时代','比亚迪','亿纬锂能','国轩高科','欣旺达','阳光电源','隆基绿能','晶科能源','天合光能','远景能源'],
+      auto:['蔚来','小鹏汽车','理想汽车','赛力斯','零跑汽车','极氪','地平线','黑芝麻智能','禾赛科技','速腾聚创'],
+      space:['蓝箭航天','中科宇航','天兵科技','星际荣耀','银河航天','天仪研究院','时空道宇','零重力飞机工业','峰飞航空科技','沃飞长空'],
+      manufacture:['华大智造','汇川技术','锐科激光','大族激光','先导智能','杭可科技','拓斯达','柏楚电子','秦川机床','华中数控'],
+      quantum:['本源量子','国盾量子','图灵量子','启科量子','华翊量子','玻色量子','鲲游光电','曦智科技','光迅科技','联特科技'],
+      bio:['联影医疗','迈瑞医疗','微创机器人','华大基因','诺唯赞','燃石医学','贝瑞基因','博奥生物','迪安诊断','百济神州'],
+      sensor:['京东方','天马微电子','TCL华星','歌尔股份','舜宇光学','韦尔股份','思特威','纳芯微','汉威科技','敏芯股份']
+    };
+    const services={
+      chip:{sources:['研发文档','测试平台','项目系统'],todos:[['汇总验证异常并生成日报','auto'],['同步版本变更影响','auto'],['方案评审与资源协调','human']],evidence:['验证流程','版本协同']},
+      ai:{sources:['模型评测','知识库','客户工单'],todos:[['聚合模型评测结果','auto'],['更新客户知识条目','auto'],['确定行业方案负责人','human']],evidence:['模型评测','行业交付']},
+      robot:{sources:['测试记录','售后工单','研发文档'],todos:[['汇总本周测试异常','auto'],['对齐供应商技术参数','auto'],['完善客户 POC 方案','human']],evidence:['规模化测试','POC 交付']},
+      energy:{sources:['质量系统','设备数据','供应链'],todos:[['生成质量异常日报','auto'],['核对物料与版本状态','auto'],['组织供应商质量复盘','human']],evidence:['质量闭环','供应链协同']},
+      auto:{sources:['车辆数据','研发项目','客户反馈'],todos:[['汇总车辆问题模式','auto'],['同步软件版本影响','auto'],['协调道路测试资源','human']],evidence:['版本运营','测试交付']},
+      space:{sources:['试验数据','任务计划','物料台账'],todos:[['归集关键试验参数','auto'],['核对任务节点状态','auto'],['安排任务风险评审','human']],evidence:['试验工程化','任务协同']},
+      manufacture:{sources:['设备日志','MES','质量记录'],todos:[['聚合设备异常模式','auto'],['生成产线效率周报','auto'],['指派工艺改善负责人','human']],evidence:['预测维护','工艺优化']},
+      quantum:{sources:['实验记录','器件测试','研究文档'],todos:[['整理实验参数差异','auto'],['追踪器件测试结果','auto'],['组织技术路线评审','human']],evidence:['实验复现','器件验证']},
+      bio:{sources:['设备日志','实验记录','法规库'],todos:[['聚合设备运行异常','auto'],['生成客户问题知识条目','auto'],['评审实验流程合规性','human']],evidence:['设备运维','法规交付']},
+      sensor:{sources:['测试数据','客户需求','供应链'],todos:[['汇总器件良率变化','auto'],['同步客户规格变更','auto'],['协调样品验证负责人','human']],evidence:['良率优化','样品交付']}
+    };
+    const categoryPortraits={
+      chip:{role:'上游核心器件与计算基础设施企业',scenes:'芯片设计、晶圆制造、封装验证与整机交付',needs:'晶圆制造、EDA/IP、先进封装及下游场景验证'},
+      ai:{role:'模型、算法与智能服务提供商',scenes:'大模型训练推理、智能体和行业 AI 应用',needs:'算力基础设施、高质量行业数据与标杆落地场景'},
+      robot:{role:'具身智能与自动化设备提供商',scenes:'工业自动化、商业服务、家庭与特种作业',needs:'核心零部件、视觉感知、运动控制与场景共创'},
+      energy:{role:'新能源材料、设备与系统解决方案企业',scenes:'动力电池、储能、光伏、风电与能源管理',needs:'核心材料、智能制造、电网接入与下游客户验证'},
+      auto:{role:'智能汽车及车载核心系统企业',scenes:'智能电动车、高级驾驶辅助、激光雷达与车载计算',needs:'芯片、电池、传感器、软件栈与整车验证'},
+      space:{role:'商业航天与低空经济企业',scenes:'运载火箭、卫星制造运营、遥感数据与 eVTOL',needs:'高可靠零部件、仿真测试、运营资质与应用场景'},
+      manufacture:{role:'工业装备与先进制造解决方案企业',scenes:'数控系统、激光加工、锂电设备、工业自动化与生物制造',needs:'核心器件、工业软件、产线数据与头部客户验证'},
+      quantum:{role:'量子科技与光电计算器件企业',scenes:'量子计算通信、光子计算、光模块与精密光学',needs:'高性能器件、制程平台、软硬协同与科研客户验证'},
+      bio:{role:'医疗器械、生命科学与创新药企业',scenes:'医学影像、体外诊断、基因检测、手术机器人与创新药',needs:'临床数据、法规注册、医院场景与供应链协同'},
+      sensor:{role:'显示、光学与智能感知器件企业',scenes:'显示面板、声光器件、图像传感器、MEMS 与工业感知',needs:'晶圆制造、封装测试、整机导入与规模化量产'}
+    };
+    const profileDirections={
+      chip:'全栈 ICT 与自研芯片|晶圆代工与制程平台|AI 加速芯片与智能计算|3D NAND 闪存|高端 CPU 与 DCU|内存接口与高速互连芯片|通用 GPU 与智能计算|GPU 与高性能计算平台|云端 AI 训练与推理芯片|碳化硅衬底材料'.split('|'),
+      ai:'视觉智能与大模型平台|智能语音与星火大模型|企业 AI 决策与大模型平台|人机协同操作系统与视觉智能|视觉计算与医疗、城市 AI|GLM 大模型与智能体|企业级大模型与行业应用|长文本大模型与 Kimi 应用|多模态大模型与 AI 原生应用|多模态大模型与推理智能|开源推理大模型与基础研究|大模型与企业 AI 解决方案|端侧高效大模型与智能体|大模型推理平台与 MaaS|异构 AI 基础设施与 MaaS|AI 基础设施与智算云|认知智能与企业智能体|企业文本智能与知识管理|数字人与多模态交互|销售科技与对话智能|多模态大模型与 3D 内容|视频生成与多模态大模型|AI 视频生成与创意工具|视觉智能与端侧 AI|计算机视觉与城市商业智能|AI 数字人与内容生成'.split('|'),
+      robot:'民用无人机与空中影像|四足及人形机器人|人形服务机器人|家庭服务与清洁机器人|智能清洁机器人|工业运动控制与机器人|工业机器人与智能制造|人形机器人与教育场景|康复机器人与通用人形平台|协作机器人与柔性自动化'.split('|'),
+      energy:'动力电池与储能系统|新能源汽车与动力电池|锂电池与储能|动力电池与能源存储|消费与动力锂电池|光伏逆变器与储能系统|单晶硅片与光伏组件|高效光伏电池与组件|光伏组件与智慧能源|风电整机与智慧能源管理'.split('|'),
+      auto:'高端智能电动汽车|智能电动汽车与驾驶辅助|家庭智能电动汽车|智能新能源汽车|智能电动汽车与电驱系统|高端智能电动汽车|高级驾驶辅助计算平台|智能汽车计算芯片|车载激光雷达与感知|激光雷达与机器人感知'.split('|'),
+      space:'可重复使用液氧甲烷运载火箭|中大型固体与液体运载火箭|商业液体运载火箭|商业运载火箭与可重复使用技术|低轨宽带通信卫星|微小卫星与遥感数据|卫星星座与时空信息服务|新能源固定翼飞机与 eVTOL|大型 eVTOL 与低空运营|电动垂直起降航空器'.split('|'),
+      manufacture:'基因测序仪与生命科学制造|工业自动化与驱动控制|光纤激光器|激光加工设备与工业视觉|锂电池智能制造装备|电池后道处理与测试设备|工业机器人与注塑自动化|激光切割控制系统|数控机床与高端装备|数控系统与工业机器人'.split('|'),
+      quantum:'超导量子计算与量子云|量子通信与安全产品|光量子计算与芯片|量子通信网络与核心设备|离子阱量子计算|相干光量子计算|精密微纳光学与 AR 光学|光子计算与高速互连|光通信器件与模块|高速光模块与数据中心互连'.split('|'),
+      bio:'高端医学影像设备与放疗|生命信息监护与体外诊断|腌镜手术机器人|基因测序与生物信息|分子诊断试剂与生命科学工具|肿瘤精准医疗与基因检测|生育健康与基因检测|生物芯片与分子诊断|医学诊断服务与实验室网络|创新药研发与全球临床'.split('|'),
+      sensor:'半导体显示面板与物联网传感|中小尺寸显示面板|大尺寸显示面板与印刷 OLED|声学、光学与 XR 硬件|光学镜头与影像模组|CMOS 图像传感器与模拟芯片|CMOS 图像传感器|模拟与混合信号芯片|气体传感器与物联网|MEMS 传感器与芯片'.split('|')
+    };
+    const companies=[];
+    categories.slice(1).forEach((cat,ci)=>{const names=groups[cat.id],portrait=categoryPortraits[cat.id];names.forEach((name,i)=>{const progress=names.length===1?0:i/(names.length-1),r=1.05+progress*4.65+(i%2?.06:-.05),theta=cat.angle+r*.24+((i%5)-2)*.068,z=(((i*37+ci*19)%19)-9)/9*2.3,jitter=(((i*11+ci*7)%11)-5)*.075;companies.push({id:`${cat.id}-${i}`,name,cat:cat.id,r,theta,x:r*Math.cos(theta)+z*.12,y:r*Math.sin(theta)+jitter,z,size:5+((i*5+ci*3)%5),profile:{direction:profileDirections[cat.id]?.[i]||cat.name,role:portrait.role,scenes:portrait.scenes,needs:portrait.needs}})})});
+    const edges=[];
+    categories.slice(1).forEach((cat,ci)=>{const arm=companies.filter(c=>c.cat===cat.id),next=companies.filter(c=>c.cat===categories.slice(1)[(ci+1)%10].id);for(let i=0;i<arm.length-1;i++)edges.push({a:arm[i].id,b:arm[i+1].id,type:'intra'});[.22,.52,.82].forEach(p=>{const ai=Math.min(arm.length-1,Math.round((arm.length-1)*p)),ni=Math.min(next.length-1,Math.round((next.length-1)*p));edges.push({a:arm[ai].id,b:next[ni].id,type:'cross'})})});
+    [['华为','中芯国际','供应链'],['寒武纪','商汤科技','技术合作'],['地平线','比亚迪','技术合作'],['宁德时代','蔚来','供应链'],['大疆','禾赛科技','技术合作'],['宇树科技','傅利叶智能','生态伙伴'],['蓝箭航天','中科宇航','生态伙伴'],['本源量子','国盾量子','技术合作'],['汇川技术','比亚迪','供应链'],['华大智造','华大基因','生态伙伴'],['DeepSeek','硅基流动','AI 服务'],['DeepSeek','寒武纪','算力协同'],['面壁智能','无问芯穹','模型基础设施'],['九章云极','海光信息','智算合作'],['云天励飞','华为','端侧 AI'],['格灵深瞳','京东方','视觉感知'],['生数科技','爱诗科技','多模态生态']].forEach(([a,b,type])=>{const ca=companies.find(c=>c.name===a),cb=companies.find(c=>c.name===b);if(ca&&cb)edges.push({a:ca.id,b:cb.id,type:'custom',label:type})});
+    try{const saved=JSON.parse(localStorage.getItem('hardtech-custom-links')||'[]');saved.forEach(e=>edges.push({...e,type:'custom',user:true}))}catch{}
+
+    const $=s=>document.querySelector(s),stage=$('#stage'),canvas=$('#cloud'),ctx=canvas.getContext('2d'),svg=$('#relations'),nodeLayer=$('#nodes'),sectorList=$('#sector-list'),search=$('#search'),detail=$('#detail');
+    let yaw=-.1,pitch=.73,zoom=1.02,focus='all',selected=['robot-1'],query='',drag=null,positions={},manualFromMy=false;
+    let myCompany=localStorage.getItem('hardtech-my-company')||'robot-1';if(!companies.some(c=>c.id===myCompany))myCompany='robot-1';
+    let seed=918273;const rnd=()=>{seed=(seed*16807)%2147483647;return(seed-1)/2147483646};const normal=()=>{const u=Math.max(.0001,rnd()),v=rnd();return Math.sqrt(-2*Math.log(u))*Math.cos(Math.PI*2*v)};
+    const particles=[];for(let i=0;i<5200;i++){if(i<850){const r=Math.pow(rnd(),2.4)*1.7,a=rnd()*Math.PI*2;particles.push({x:r*Math.cos(a),y:r*Math.sin(a),z:normal()*(.45-r*.16),tone:i%4,alpha:.22+rnd()*.35,size:.35+rnd()*.9})}else{const r=.4+Math.pow(rnd(),.72)*6,arm=Math.floor(rnd()*5),a=arm*Math.PI*2/5+r*.58+normal()*(.08+r*.03);particles.push({x:r*Math.cos(a),y:r*Math.sin(a),z:normal()*(.17-r*.017),tone:(arm+i)%4,alpha:.09+rnd()*.26,size:.25+rnd()*.7})}}
+    const byId=id=>companies.find(c=>c.id===id),catOf=id=>categories.find(c=>c.id===id),world=c=>({x:c.x,y:c.y,z:c.z});
+    const svgEl=(name,attrs={})=>{const n=document.createElementNS('http://www.w3.org/2000/svg',name);Object.entries(attrs).forEach(([k,v])=>n.setAttribute(k,v));return n};
+    function project(x,y,z=0){const co=Math.cos(yaw),si=Math.sin(yaw),x1=x*co-y*si,y1=x*si+y*co,cp=Math.cos(pitch),sp=Math.sin(pitch),y2=y1*cp-z*sp,depth=y1*sp+z*cp,w=stage.clientWidth,h=stage.clientHeight,base=Math.min(w/14.6,h/9.4)*zoom,perspective=Math.max(.68,Math.min(1.38,1+depth*.075));return{x:w/2+x1*base*perspective,y:h*.5+y2*base*perspective,depth,perspective}}
+    function relevant(c){return(focus==='all'||c.cat===focus)&&(!query||(`${c.name} ${catOf(c.cat).name} ${services[c.cat].sources.join(' ')}`).toLowerCase().includes(query))}
+    function neighborhood(){const chosen=new Set(selected),neighbors=new Set(selected);edges.forEach(e=>{if(chosen.has(e.a)||chosen.has(e.b)){neighbors.add(e.a);neighbors.add(e.b)}});return{chosen,neighbors}}
+    function drawCloud(){const w=stage.clientWidth,h=stage.clientHeight,dpr=Math.min(devicePixelRatio||1,2);if(canvas.width!==Math.round(w*dpr)||canvas.height!==Math.round(h*dpr)){canvas.width=Math.round(w*dpr);canvas.height=Math.round(h*dpr)}ctx.setTransform(dpr,0,0,dpr,0,0);ctx.clearRect(0,0,w,h);const palette=['#4285f4','#34a853','#ea4335','#9334e6'];particles.map(p=>({...p,...project(p.x,p.y,p.z)})).sort((a,b)=>a.depth-b.depth).forEach(p=>{ctx.globalAlpha=p.alpha;ctx.fillStyle=palette[p.tone];ctx.beginPath();ctx.arc(p.x,p.y,p.size,0,Math.PI*2);ctx.fill()});ctx.globalAlpha=1}
+    function render(){const w=stage.clientWidth,h=stage.clientHeight;svg.setAttribute('viewBox',`0 0 ${w} ${h}`);svg.innerHTML='';drawCloud();positions={};companies.forEach(c=>{const p=world(c);positions[c.id]=project(p.x,p.y,p.z)});const state=neighborhood(),hasSelection=selected.length>0;edges.slice().sort((u,v)=>((positions[u.a].depth+positions[u.b].depth)-(positions[v.a].depth+positions[v.b].depth))).forEach(e=>{const a=positions[e.a],b=positions[e.b],active=state.chosen.has(e.a)||state.chosen.has(e.b),bend=12+Math.abs(a.depth-b.depth)*3,p=svgEl('path',{d:`M ${a.x} ${a.y} Q ${(a.x+b.x)/2} ${(a.y+b.y)/2-bend} ${b.x} ${b.y}`,class:`edge ${e.type==='cross'?'cross ':''}${e.type==='custom'?'custom ':''}${e.source==='ai'?'ai ':''}${active?'highlight':hasSelection&&!query?'dim':''}`});svg.appendChild(p)});const center=project(0,0,0);svg.appendChild(svgEl('circle',{cx:center.x,cy:center.y,r:28,class:'core-ring'}));svg.appendChild(svgEl('circle',{cx:center.x,cy:center.y,r:4,class:'core-dot'}));const label=svgEl('text',{x:center.x,y:center.y+20,class:'core-label'});label.textContent='能力内核';svg.appendChild(label);nodeLayer.innerHTML='';companies.slice().sort((a,b)=>positions[a.id].depth-positions[b.id].depth).forEach(c=>{const p=positions[c.id],cat=catOf(c.cat),isSelected=state.chosen.has(c.id),isNeighbor=hasSelection&&state.neighbors.has(c.id),dim=!relevant(c)||(!query&&hasSelection&&!isNeighbor),b=document.createElement('button');b.type='button';b.className=`company ${isSelected?'selected ':''}${isNeighbor&&!isSelected?'neighbor ':''}${dim?'dim':''}`;b.dataset.id=c.id;b.style.cssText=`--tone:${cat.color};--diameter:${25+c.size*1.25}px;--depth-scale:${p.perspective};left:${p.x}px;top:${p.y}px;z-index:${Math.round(p.depth*20+120)}`;b.setAttribute('aria-label',`${c.name}，${cat.name}`);b.setAttribute('aria-pressed',isSelected?'true':'false');b.innerHTML=`<span class="company-orb">${Array.from(c.name).slice(0,2).join('')}</span><span class="company-label">${c.name}</span>`;b.addEventListener('pointerdown',e=>e.stopPropagation());b.addEventListener('click',()=>choose(c.id));nodeLayer.appendChild(b)})}
+    function choose(id){if(manualFromMy){selected=id===myCompany?[myCompany]:[myCompany,id]}else if(selected.includes(id))selected=selected.filter(x=>x!==id);else if(selected.length<2)selected.push(id);else selected=[selected[1],id];updateSelection();render();renderDetail(selected.length?byId(selected[selected.length-1]):null)}
+    function updateSelection(){const el=$('#selection'),btn=$('#connect');btn.disabled=selected.length!==2;if(!selected.length)el.textContent='选择两家企业建立联系';else if(selected.length===1)el.innerHTML=`已选择 <strong>${byId(selected[0]).name}</strong>，再选一家企业建立联系`;else el.innerHTML=`<strong>${byId(selected[0]).name}</strong> ＋ <strong>${byId(selected[1]).name}</strong>`}
+    function renderDetail(c){
+      detail.classList.toggle('empty',!c);if(!c)return;
+      const cat=catOf(c.cat),service=services[c.cat],profile=c.profile,tags=[cat.name,profile.direction,...service.evidence].slice(0,4);
+      $('#company-badge').textContent=Array.from(c.name).slice(0,2).join('');
+      $('#company-name').textContent=c.name;
+      $('#company-meta').textContent=`${cat.name} · 企业介绍与精准画像`;
+      $('#company-intro').textContent=`${c.name}聚焦${profile.direction}，在${cat.name}产业中定位为${profile.role}。其能力主要覆盖${profile.scenes}，画像重点关注技术能力、产品化进展与生态协作信号。`;
+      $('#profile-direction').textContent=profile.direction;
+      $('#profile-role').textContent=profile.role;
+      $('#profile-scenes').textContent=profile.scenes;
+      $('#profile-needs').textContent=profile.needs;
+      $('#profile-tags').innerHTML=tags.map(x=>`<span class="profile-tag">${x}</span>`).join('');
+      $('#source-tags').innerHTML=service.sources.map(x=>`<span class="tag">${x}</span>`).join('');
+      $('#todos').innerHTML=service.todos.map(t=>`<div class="todo ${t[1]==='human'?'human':''}"><i class="todo-dot"></i><div><strong>${t[0]}</strong><span>${t[1]==='auto'?'AI 可直接执行':'需要判断或授权'}</span></div><em class="todo-route">${t[1]==='auto'?'自动完成':'匹配员工'}</em></div>`).join('');
+      $('#evidence-tags').innerHTML=service.evidence.map(x=>`<span class="tag green">+ ${x}</span>`).join('');
+      const state=neighborhood(),partners=[...state.neighbors].filter(id=>id!==c.id).map(byId).filter(Boolean).slice(0,5);
+      $('#partners').innerHTML=partners.map(x=>`<span class="partner"><i></i>${x.name}</span>`).join('')||'<span class="tag blue">完成任务后生成连接建议</span>';
+    }
+    const complements={chip:['ai','robot','auto','sensor'],ai:['chip','robot','auto','bio'],robot:['chip','ai','sensor','manufacture'],energy:['auto','manufacture','sensor'],auto:['energy','chip','ai','sensor'],space:['chip','manufacture','sensor','ai'],manufacture:['robot','energy','space','sensor'],quantum:['chip','ai','sensor'],bio:['ai','manufacture','sensor'],sensor:['robot','auto','chip','bio']};
+    function relationExists(a,b){return edges.find(e=>(e.a===a&&e.b===b)||(e.a===b&&e.b===a))}
+    function persistLinks(){const custom=edges.filter(e=>e.user).map(({a,b,label,source})=>({a,b,label,source}));localStorage.setItem('hardtech-custom-links',JSON.stringify(custom))}
+    function upsertConnection(a,b,label,source='manual'){if(!a||!b||a===b)return;const existing=relationExists(a,b);if(existing){existing.type='custom';existing.label=label;existing.user=true;existing.source=source}else edges.push({a,b,type:'custom',label,user:true,source});persistLinks()}
+    function showPanel(name){const mine=name==='my';$('#profile-panel').hidden=mine;$('#my-panel').hidden=!mine;$('#tab-profile').classList.toggle('active',!mine);$('#tab-my').classList.toggle('active',mine);if(mine)renderMyPanel()}
+    function buildMySelect(){const select=$('#my-company');categories.slice(1).forEach(cat=>{const group=document.createElement('optgroup');group.label=cat.name;companies.filter(c=>c.cat===cat.id).forEach(c=>{const option=document.createElement('option');option.value=c.id;option.textContent=c.name;group.appendChild(option)});select.appendChild(group)});select.value=myCompany}
+    function aiCandidates(base){const wanted=complements[base.cat]||[];return companies.filter(c=>c.id!==base.id&&!relationExists(base.id,c.id)).map(c=>{const score=Math.min(98,61+c.size*2+(wanted.includes(c.cat)?18:c.cat===base.cat?8:4));const reason=c.cat===base.cat?`${catOf(c.cat).name}同赛道能力互补`:wanted.includes(c.cat)?`${catOf(base.cat).name} × ${catOf(c.cat).name}产业链匹配`:'潜在跨产业技术协同';return{company:c,score,reason}}).sort((a,b)=>b.score-a.score||a.company.name.localeCompare(b.company.name,'zh-CN')).slice(0,4)}
+    function renderMyPanel(){const base=byId(myCompany);if(!base)return;const links=edges.filter(e=>e.a===base.id||e.b===base.id),partners=links.map(e=>byId(e.a===base.id?e.b:e.a)).filter(Boolean),sectors=new Set(partners.map(c=>c.cat)),candidates=aiCandidates(base);$('#my-company').value=base.id;$('#my-link-count').textContent=links.length;$('#my-sector-count').textContent=sectors.size;$('#my-ai-count').textContent=candidates.length;$('#ai-recommendations').innerHTML=candidates.map(({company,score,reason})=>`<article class="recommend"><span class="recommend-badge" style="--tone:${catOf(company.cat).color}">${Array.from(company.name).slice(0,2).join('')}</span><span class="recommend-copy"><strong>${company.name}</strong><span>${reason}</span></span><span class="match"><b>${score}%</b><button class="mini-add" type="button" data-ai-target="${company.id}">加入</button></span></article>`).join('')||'<div class="my-network-note">当前高匹配候选已全部建立关系。</div>';document.querySelectorAll('[data-ai-target]').forEach(btn=>btn.addEventListener('click',()=>{const target=btn.dataset.aiTarget;upsertConnection(base.id,target,'AI 匹配','ai');render();renderMyPanel();renderDetail(base);showToast(`AI 已建立 ${base.name} × ${byId(target).name}`)}))}
+    function setMyCompany(id){myCompany=id;localStorage.setItem('hardtech-my-company',id);manualFromMy=true;focus='all';sectorList.querySelectorAll('.sector-btn').forEach(b=>b.classList.toggle('active',b.dataset.id==='all'));selected=[id];$('#graph-subtitle').textContent=`我的星系 · ${byId(id).name}为中心`;updateSelection();render();renderDetail(byId(id));renderMyPanel()}
+    function setFocus(id){manualFromMy=false;focus=id;sectorList.querySelectorAll('.sector-btn').forEach(b=>b.classList.toggle('active',b.dataset.id===id));const c=id==='all'?byId('robot-1'):companies.find(x=>x.cat===id);selected=[c.id];$('#graph-subtitle').textContent=`${id==='all'?'全部产业':catOf(id).name} · 能力、需求与合作关系`;updateSelection();render();renderDetail(c)}
+    function buildSectors(){categories.forEach(c=>{const b=document.createElement('button'),count=c.id==='all'?companies.length:companies.filter(company=>company.cat===c.id).length;b.type='button';b.className=`sector-btn ${c.id==='all'?'active':''}`;b.dataset.id=c.id;b.style.setProperty('--tone',c.color);b.innerHTML=`<i class="sector-dot"></i><span>${c.name}</span><span class="sector-count">${count}</span>`;b.addEventListener('click',()=>setFocus(c.id));sectorList.appendChild(b)})}
+    function showToast(message){const t=$('#toast');t.textContent=message;t.classList.add('show');clearTimeout(showToast.timer);showToast.timer=setTimeout(()=>t.classList.remove('show'),2300)}
+    $('#connect').addEventListener('click',()=>{if(selected.length!==2)return;const type=$('#relation-type').value,a=selected[0],b=selected[1];upsertConnection(a,b,type,'manual');render();renderMyPanel();renderDetail(byId(b));showToast(`${byId(a).name} × ${byId(b).name}：${type}已建立`)});
+    $('#clear').addEventListener('click',()=>{manualFromMy=false;selected=[];updateSelection();render();renderDetail(null)});
+    $('#reset').addEventListener('click',()=>{yaw=-.1;pitch=.73;zoom=1.02;query='';search.value='';setFocus('all')});
+    $('#open-my').addEventListener('click',()=>showPanel('my'));$('#tab-my').addEventListener('click',()=>showPanel('my'));$('#tab-profile').addEventListener('click',()=>showPanel('profile'));
+    $('#my-company').addEventListener('change',e=>setMyCompany(e.target.value));
+    $('#manual-mode').addEventListener('click',()=>{setMyCompany(myCompany);showToast(`已以 ${byId(myCompany).name} 为中心，请在星图选择目标企业`)});
+    $('#ai-connect').addEventListener('click',()=>{const btn=$('#ai-connect'),base=byId(myCompany),matches=aiCandidates(base).slice(0,3);if(!matches.length){showToast('当前没有新的高匹配候选');return}btn.disabled=true;btn.classList.add('running');btn.textContent='AI 匹配中…';setTimeout(()=>{matches.forEach(({company})=>upsertConnection(base.id,company.id,'AI 匹配','ai'));selected=[base.id];manualFromMy=true;render();renderMyPanel();renderDetail(base);btn.disabled=false;btn.classList.remove('running');btn.textContent='AI 自动建立';showToast(`AI 已为 ${base.name} 建立 ${matches.length} 条关系`)},680)});
+    search.addEventListener('input',()=>{query=search.value.trim().toLowerCase();render()});
+    stage.addEventListener('pointerdown',e=>{drag={x:e.clientX,y:e.clientY,yaw,pitch};stage.setPointerCapture(e.pointerId);stage.classList.add('dragging')});
+    stage.addEventListener('pointermove',e=>{if(!drag)return;yaw=drag.yaw+(e.clientX-drag.x)*.008;pitch=Math.max(.15,Math.min(1.38,drag.pitch+(e.clientY-drag.y)*.004));render()});
+    stage.addEventListener('pointerup',e=>{drag=null;stage.releasePointerCapture(e.pointerId);stage.classList.remove('dragging')});stage.addEventListener('pointercancel',()=>{drag=null;stage.classList.remove('dragging')});
+    stage.addEventListener('wheel',e=>{e.preventDefault();zoom=Math.max(.68,Math.min(1.5,zoom+(e.deltaY>0?-.06:.06)));render()},{passive:false});
+    new ResizeObserver(render).observe(stage);$('#company-total').textContent=companies.length;$('#industry-total').textContent=categories.length-1;buildSectors();buildMySelect();updateSelection();render();renderDetail(byId('robot-1'));renderMyPanel();
+  </script>
+</body>
+</html>
